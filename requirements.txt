@@ -1,0 +1,32 @@
+# FastAPI
+fastapi
+uvicorn[standard]
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# Database
+sqlalchemy
+psycopg2-binary
+alembic
+
+# LangChain & RAG
+langchain
+langchain-community
+langchain-google-genai
+chromadb
+sentence-transformers
+pypdf
+
+# ML
+scikit-learn
+numpy
+pandas
+
+# MLflow
+mlflow
+
+# Utils
+pydantic
+pydantic-settings
+python-dotenv
