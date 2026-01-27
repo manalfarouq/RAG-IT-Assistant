@@ -30,3 +30,6 @@ mlflow
 pydantic
 pydantic-settings
 python-dotenv
+
+# PDF
+pypdf2
