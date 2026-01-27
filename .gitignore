@@ -3,3 +3,57 @@ venv/
 __pycache__/
 .history/
 .env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Data
+data/raw/*.pdf
+data/processed/*
+data/vector_db/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/vector_db/.gitkeep
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Docker
+*.env.docker
+
+# Kubernetes
+kubernetes/secrets.yaml
