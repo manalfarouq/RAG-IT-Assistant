@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # RAG Configuration
     PDF_PATH: str = "data/raw/data.pdf"
     CHROMA_PERSIST_DIR: str = "data/vector_db/chroma"
-    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+    EMBEDDING_MODEL: str = "BAAI/bge-m3"
     CHUNK_SIZE: int = 500
     CHUNK_OVERLAP: int = 50
     
@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = 0.3
     LLM_TOP_K: int = 3
     
-    # API Keys (optionnelles)
+    # API Keys
     HUGGINGFACE_API_KEY: Optional[str] = None
     GOOGLE_API_KEY: Optional[str] = None
     
