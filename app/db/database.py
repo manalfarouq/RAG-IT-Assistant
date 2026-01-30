@@ -11,7 +11,7 @@ from app.core.config import settings
 engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,  # Vérifier la connexion avant utilisation
-    echo=False  # Mettre True pour voir les requêtes SQL (debug)
+    echo=True  # Mettre True pour voir les requêtes SQL (debug)
 )
 
 # Créer une session
