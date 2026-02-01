@@ -1,5 +1,5 @@
 """
-Configuration de la connexion PostgreSQL
+Configuration de la connexion PostgreSQL avec SQLAlchemy
 """
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,28 +7,34 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
-# Créer le moteur de connexion
+# Créer le moteur de connexion à PostgreSQL
 engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,  # Vérifier la connexion avant utilisation
-    echo=True  # Mettre True pour voir les requêtes SQL (debug)
+    pool_size=10,  # Nombre de connexions dans le pool
+    max_overflow=20,  # Connexions supplémentaires si nécessaire
+    echo=False  # Mettre True pour voir les requêtes SQL (debug)
 )
 
-# Créer une session
+# Créer une fabrique de sessions
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base pour les modèles
+# Base pour tous les modèles SQLAlchemy
 Base = declarative_base()
 
-# Fonction pour obtenir une session
+
 def get_db():
     """
-    Crée une session de base de données
-    À utiliser avec FastAPI dependency injection
+    Dependency pour FastAPI
+    Crée une session DB et la ferme automatiquement après usage
+    
+    Usage:
+        @app.get("/users")
+        def get_users(db: Session = Depends(get_db)):
+            return db.query(User).all()
     """
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-        
