@@ -2,7 +2,7 @@
 Service LLM pour générer les réponses
 """
 from transformers import pipeline
-from app.core.config import settings
+from core.config import settings
 
 _llm = None
 

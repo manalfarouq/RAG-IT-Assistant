@@ -33,3 +33,6 @@ python-dotenv
 
 # PDF
 pypdf2
+
+pydantic[email]
+matplotlib

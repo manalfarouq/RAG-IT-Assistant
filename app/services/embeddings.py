@@ -2,7 +2,7 @@
 Génération d'embeddings
 """
 from sentence_transformers import SentenceTransformer
-from app.core.config import settings
+from core.config import settings
 
 _model = None
 

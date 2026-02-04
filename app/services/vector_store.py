@@ -7,8 +7,8 @@ import chromadb
 from chromadb.config import Settings as ChromaSettings
 from langchain_core.documents import Document
 
-from app.core.config import settings
-from app.services.embeddings import embed_text, embed_texts
+from core.config import settings
+from services.embeddings import embed_text, embed_texts
 
 
 class VectorStore:
