@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from ..db.database import get_db
 from ..auth.token_auth import create_user, get_user_by_email
-from ..schemas.login_request_schema import RegisterRequest
+from ..schemas.auth_schema import RegisterRequest
 from ..schemas.user_schema import UserResponse
 
 

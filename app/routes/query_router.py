@@ -15,7 +15,6 @@ from ..rag.pipeline import RAGPipeline
 
 router = APIRouter(prefix="/query", tags=["RAG Query"])
 
-# Instance globale du pipeline RAG
 rag_pipeline = None
 
 
@@ -33,20 +32,15 @@ async def query_rag(
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user)
 ):
-    """
-    Effectue une requête RAG
-    """
+    """Effectue une requête RAG"""
     try:
         start_time = time.time()
         
-        # Obtenir le pipeline et générer la réponse
         pipeline = get_rag_pipeline()
         answer = pipeline.query(request.question)
         
-        # Calculer la latence
         latency_ms = (time.time() - start_time) * 1000
         
-        # Sauvegarder en base
         new_query = Query(
             user_id=current_user_id,
             question=request.question,

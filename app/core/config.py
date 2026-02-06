@@ -1,47 +1,39 @@
-# app/core/config.py
+"""
+Configuration de l'application
+"""
 from pydantic_settings import BaseSettings
-from typing import List, Optional
+from typing import Optional
 
 
 class Settings(BaseSettings):
     # API
-    PROJECT_NAME: str = "RAG IT Assistant"
+    PROJECT_NAME: str = "RAG IT Assistant" 
     
     # Security
     SECRET_KEY: str
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ALGORITHM: str = "HS256"  
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30  
     
     # Database
     DATABASE_URL: str
     
-    # RAG Configuration
-    PDF_PATH: str = "data/raw/data.pdf"
-    CHROMA_PERSIST_DIR: str = "data/vector_db/chroma"
-    EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
-    CHUNK_SIZE: int = 500
-    CHUNK_OVERLAP: int = 50
+    # RAG
+    PDF_PATH: str = "/app/data/raw/data.pdf" 
+    CHROMA_PERSIST_DIR: str = "/tmp/chroma"  
+    EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"  
+    CHUNK_SIZE: int = 500  
+    CHUNK_OVERLAP: int = 50  
     
-    # LLM Configuration
-    LLM_PROVIDER: str = "huggingface"
-    LLM_MODEL: str = "google/flan-t5-base"
-    LLM_TEMPERATURE: float = 0.3
-    LLM_TOP_K: int = 3
+    # LLM
+    LLM_MODEL: str = "google/flan-t5-base" 
     
     # API Keys
     HF_TOKEN: Optional[str] = None
-    HUGGINGFACE_API_KEY: Optional[str] = None
-    GEMINI_API_KEY: Optional[str] = None
-    GOOGLE_API_KEY: Optional[str] = None
-    
-    # MLflow
-    MLFLOW_TRACKING_URI: str = "http://localhost:5000"
-    
-    # CORS
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
     
     class Config:
-        case_sensitive = False  # ← Changé aussi ça pour éviter les problèmes
+        env_file = ".env"
+        case_sensitive = False
+        extra = "ignore"  
 
 
 settings = Settings()
