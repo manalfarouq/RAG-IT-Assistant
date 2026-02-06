@@ -2,14 +2,110 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
+from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 from typing import Optional
-from core.config import settings
-from schemas.Token_schema import TokenData, Token
 
+from ..core.config import settings
+from ..schemas.token_schema import TokenData, Token
+from ..models.user_model import User
 
 
 security = HTTPBearer()
+
+# Configuration du contexte de hashage des mots de passe
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Vérifie si le mot de passe en clair correspond au hash
+    
+    Args:
+        plain_password: Mot de passe en clair
+        hashed_password: Mot de passe hashé
+    
+    Returns:
+        True si le mot de passe correspond, False sinon
+    """
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password: str) -> str:
+    """
+    Hash un mot de passe
+    
+    Args:
+        password: Mot de passe en clair
+    
+    Returns:
+        Mot de passe hashé
+    """
+    return pwd_context.hash(password)
+
+
+def get_user_by_email(db: Session, email: str) -> Optional[User]:
+    """
+    Récupère un utilisateur par son email
+    
+    Args:
+        db: Session de base de données
+        email: Email de l'utilisateur
+    
+    Returns:
+        L'utilisateur si trouvé, None sinon
+    """
+    return db.query(User).filter(User.email == email).first()
+
+
+def create_user(db: Session, email: str, password: str) -> User:
+    """
+    Crée un nouvel utilisateur
+    
+    Args:
+        db: Session de base de données
+        email: Email de l'utilisateur
+        password: Mot de passe en clair
+    
+    Returns:
+        L'utilisateur créé
+    """
+    hashed_password = get_password_hash(password)
+    
+    db_user = User(
+        email=email,
+        hashed_password=hashed_password,
+        is_active=True
+    )
+    
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    
+    return db_user
+
+
+def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
+    """
+    Authentifie un utilisateur par email et mot de passe
+    
+    Args:
+        db: Session de base de données
+        email: Email de l'utilisateur
+        password: Mot de passe en clair
+    
+    Returns:
+        L'utilisateur si l'authentification réussit, None sinon
+    """
+    user = get_user_by_email(db, email)
+    
+    if not user:
+        return None
+    
+    if not verify_password(password, user.hashed_password):
+        return None
+    
+    return user
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:

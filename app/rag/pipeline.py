@@ -1,8 +1,8 @@
 """
 Pipeline RAG complet
 """
-from app.services.vector_store import VectorStore
-from app.services.llm import generate_answer
+from ..services.vector_store import VectorStore
+from ..services.llm import generate_answer
 
 class RAGPipeline:
     def __init__(self):
@@ -26,10 +26,5 @@ class RAGPipeline:
         # 3. Générer la réponse avec le LLM
         answer = generate_answer(question, context)
         
-        # 4. Retourner tout (pour tracking)
-        return {
-            "question": question,
-            "answer": answer,
-            "context_chunks": results,
-            "n_chunks_used": len(results)
-        }
+        # 4. Retourner la réponse (string, pas dict)
+        return answer

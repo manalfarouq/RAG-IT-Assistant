@@ -9,8 +9,8 @@ import pickle
 import os
 from pathlib import Path
 
-from services.embeddings import get_embedding_model
-from core.config import settings
+from ..services.embeddings import get_embedding_model
+from ..core.config import settings
 
 
 class QuestionClusterer:

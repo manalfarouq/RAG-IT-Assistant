@@ -4,10 +4,10 @@ Route d'inscription
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 
-from db.database import get_db
-from services.auth_service import create_user, get_user_by_email
-from schemas.LoginRequest_schema import RegisterRequest
-from schemas.user_schema import UserResponse
+from ..db.database import get_db
+from ..auth.token_auth import create_user, get_user_by_email
+from ..schemas.login_request_schema import RegisterRequest
+from ..schemas.user_schema import UserResponse
 
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])

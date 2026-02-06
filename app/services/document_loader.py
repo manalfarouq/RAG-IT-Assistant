@@ -5,7 +5,7 @@ from pathlib import Path
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from core.config import settings
+from ..core.config import settings
 
 
 def load_and_split_pdf(pdf_path=None):

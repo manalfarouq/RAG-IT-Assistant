@@ -3,6 +3,7 @@ fastapi
 uvicorn[standard]
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt==4.0.1
 python-multipart
 
 # Database
@@ -32,7 +33,7 @@ pydantic-settings
 python-dotenv
 
 # PDF
-pypdf2
+
 
 pydantic[email]
 matplotlib

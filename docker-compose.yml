@@ -1,57 +1,38 @@
 services:
-  # Base de données PostgreSQL
-  postgres:
+  db:
     image: postgres:15
-    container_name: rag_postgres
+    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: rag_db
     ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - "5432:5432"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 10s
+      test: [ "CMD-SHELL", "pg_isready -U user -d rag_db" ]
+      interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - rag_network
 
-  # Backend FastAPI
-  backend:
+  app:
+    image: rag-it-assistant:latest
+    restart: always
     build:
-      context: .
-      dockerfile: app/Dockerfile
-    container_name: rag_backend
-    environment:
-      # Variables d'environnement pour le backend
-      DATABASE_URL: postgresql://raguser:ragpassword@postgres:5432/rag_db
-      SECRET_KEY: BK4lcWJCRyqlUxD5ymyfVQ7N04z1kDqc7QWrX2Tm1k8
-      ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: 30
-      EMBEDDING_MODEL: BAAI/bge-m3
-      LLM_MODEL: google/flan-t5-base
-      CHROMA_PERSIST_DIR: /app/data/vector_db/chroma
-      PDF_PATH: /app/data/raw/data.pdf
+      context: .              # Context à la racine
+      dockerfile: Dockerfile  # Dockerfile à la racine
     ports:
       - "8000:8000"
-    volumes:
-      - ./data:/app/data  # Monter le dossier data pour ChromaDB et PDF
-      - ./logs:/app/logs  # Monter les logs
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/rag_db
+      - SECRET_KEY=supersecretkeytest
+      - HF_TOKEN=${HF_TOKEN}
+      - EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
+      - LLM_MODEL=google/flan-t5-base
+      - PDF_PATH=/app/data/raw/data.pdf
+      - CHROMA_PERSIST_DIR=/tmp/chroma
     depends_on:
-      postgres:
-        condition: service_healthy  # Attend que PostgreSQL soit prêt
-    networks:
-      - rag_network
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-
-networks:
-  rag_network:
-    driver: bridge
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./app:/app/app  

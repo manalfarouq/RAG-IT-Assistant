@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # RAG Configuration
     PDF_PATH: str = "data/raw/data.pdf"
     CHROMA_PERSIST_DIR: str = "data/vector_db/chroma"
-    EMBEDDING_MODEL: str = "BAAI/bge-m3"
+    EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     CHUNK_SIZE: int = 500
     CHUNK_OVERLAP: int = 50
     
@@ -29,7 +29,9 @@ class Settings(BaseSettings):
     LLM_TOP_K: int = 3
     
     # API Keys
+    HF_TOKEN: Optional[str] = None
     HUGGINGFACE_API_KEY: Optional[str] = None
+    GEMINI_API_KEY: Optional[str] = None
     GOOGLE_API_KEY: Optional[str] = None
     
     # MLflow
@@ -39,8 +41,7 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
     
     class Config:
-        env_file = ".env"
-        case_sensitive = True
+        case_sensitive = False  # ← Changé aussi ça pour éviter les problèmes
 
 
 settings = Settings()
