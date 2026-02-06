@@ -5,7 +5,7 @@ from pydantic import BaseModel, field_serializer
 
 class QueryRequest(BaseModel):
     """Requête utilisateur"""
-    question: str = "Comment réinitialiser un mot de passe Windows?"
+    question: str
 
 
 class QueryResponse(BaseModel):
@@ -20,8 +20,20 @@ class QueryResponse(BaseModel):
     
     @field_serializer('latency_ms')
     def format_latency(self, value: float) -> str:
-        seconds = value / 1000
-        return f"{seconds:.2f}s"
+        """Convertit latency_ms en format mm:ss"""
+        total_seconds = value / 1000
+        minutes = int(total_seconds // 60)
+        seconds = total_seconds % 60
+        
+        if minutes > 0:
+            return f"{minutes}m {seconds:.2f}s"
+        else:
+            return f"{seconds:.2f}s"
+    
+    @field_serializer('created_at')
+    def format_datetime(self, value: datetime) -> str:
+        """Formate la date en format lisible"""
+        return value.strftime("%d/%m/%Y %H:%M:%S")
     
     class Config:
         from_attributes = True

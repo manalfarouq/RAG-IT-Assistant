@@ -8,8 +8,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-rag_db}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user} -d ${POSTGRES_DB:-rag_db}"]
+      test: ["CMD-SHELL", "pg_isready -U raguser -d rag_db"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -32,3 +35,6 @@ services:
     volumes:
       - ./data:/app/data
       - ./app:/app/app
+
+volumes:
+  postgres_data:  

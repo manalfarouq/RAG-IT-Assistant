@@ -3,7 +3,7 @@ Route pour les requêtes RAG
 """
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 
 from ..db.database import get_db
@@ -27,7 +27,7 @@ def get_rag_pipeline() -> RAGPipeline:
 
 
 @router.post("/", response_model=QueryResponse)
-async def query_rag(
+def query_rag( 
     request: QueryRequest,
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user)
@@ -46,7 +46,7 @@ async def query_rag(
             question=request.question,
             answer=answer,
             latency_ms=latency_ms,
-            created_at=datetime.utcnow()
+            created_at=datetime.now(timezone.utc)  
         )
         
         db.add(new_query)
