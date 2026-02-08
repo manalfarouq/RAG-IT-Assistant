@@ -3,6 +3,7 @@ fastapi
 uvicorn[standard]
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt==4.0.1
 python-multipart
 
 # Database
@@ -30,3 +31,14 @@ mlflow
 pydantic
 pydantic-settings
 python-dotenv
+
+# PDF
+
+
+pydantic[email]
+matplotlib
+scikit-learn
+google-generativeai
+google-genai
+transformers
+torch
