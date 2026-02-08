@@ -37,3 +37,8 @@ python-dotenv
 
 pydantic[email]
 matplotlib
+scikit-learn
+google-generativeai
+google-genai
+transformers
+torch

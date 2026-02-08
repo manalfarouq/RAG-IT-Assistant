@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS queries (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     question TEXT NOT NULL,
     answer TEXT NOT NULL,
-    cluster INTEGER,
+    cluster VARCHAR(255),
     latency_ms FLOAT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

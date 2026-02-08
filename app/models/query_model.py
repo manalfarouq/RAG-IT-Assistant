@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, Float, Text, DateTime, ForeignKey, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -12,7 +12,7 @@ class Query(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     question = Column(Text, nullable=False)
     answer = Column(Text, nullable=False)
-    cluster = Column(Integer, nullable=True)
+    cluster = Column(String, nullable=True) 
     latency_ms = Column(Float, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     

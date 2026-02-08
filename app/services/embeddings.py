@@ -18,7 +18,7 @@ def get_model():
         _model = SentenceTransformer(
             settings.EMBEDDING_MODEL,
             token=settings.HF_TOKEN,
-            trust_remote_code=True  # ← Ajouté
+            trust_remote_code=True 
         )
     return _model
 

@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, Field, field_serializer
 
 
 class QueryRequest(BaseModel):
     """Requête utilisateur"""
-    question: str
+    question: str = Field(..., example="Quels sont les fondamentaux du support IT ?")
 
 
 class QueryResponse(BaseModel):
@@ -14,13 +14,12 @@ class QueryResponse(BaseModel):
     user_id: int
     question: str
     answer: str
-    cluster: Optional[int] = None
+    cluster: Optional[str] = None 
     latency_ms: float
     created_at: datetime
     
     @field_serializer('latency_ms')
     def format_latency(self, value: float) -> str:
-        """Convertit latency_ms en format mm:ss"""
         total_seconds = value / 1000
         minutes = int(total_seconds // 60)
         seconds = total_seconds % 60
@@ -32,7 +31,6 @@ class QueryResponse(BaseModel):
     
     @field_serializer('created_at')
     def format_datetime(self, value: datetime) -> str:
-        """Formate la date en format lisible"""
         return value.strftime("%d/%m/%Y %H:%M:%S")
     
     class Config:

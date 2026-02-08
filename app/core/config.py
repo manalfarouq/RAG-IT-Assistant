@@ -25,10 +25,11 @@ class Settings(BaseSettings):
     CHUNK_OVERLAP: int = 50  
     
     # LLM
-    LLM_MODEL: str = "google/flan-t5-base" 
+    LLM_MODEL: str = "etalab-ia/camembert-base-squadFR-fquad-piaf" 
     
     # API Keys
     HF_TOKEN: Optional[str] = None
+    GEMINI_API_KEY: str
     
     class Config:
         env_file = ".env"
