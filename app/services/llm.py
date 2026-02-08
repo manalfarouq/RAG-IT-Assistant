@@ -1,109 +1,68 @@
-"""
-Service LLM pour générer les réponses - Gemini 2.5 Flash (Version améliorée)
-"""
+"""LLM answer generation using Google Gemini"""
 import logging
-from google import genai
-from google.genai import types
+import google.generativeai as genai
+
 from ..core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------
-# Configuration Gemini
-# ---------------------------
-logger.info("Configuration de Gemini 2.5 Flash...")
-try:
-    client = genai.Client(api_key=settings.GEMINI_API_KEY)
-    logger.info("Gemini prêt!")
-except Exception as e:
-    logger.error(f"Erreur lors de l'initialisation de Gemini: {e}")
-    raise
+# Configure Gemini API
+genai.configure(api_key=settings.GEMINI_API_KEY)
 
-# ---------------------------
-# Constantes
-# ---------------------------
-MAX_ANSWER_LENGTH = 500  # longueur maximale de la réponse en caractères
+MAX_ANSWER_LENGTH = 600
 
-# ---------------------------
-# Fonction principale
-# ---------------------------
-def generate_answer(question: str, context: str, max_retries: int = 3) -> str:
+
+def generate_answer(question: str, context: str) -> str:
     """
-    Génère une réponse basée sur le contexte (RAG),
-    avec fallback sur les bonnes pratiques IT si le contexte est insuffisant.
-
+    Generate answer using LLM with retrieved context.
+    
     Args:
-        question: La question de l'utilisateur
-        context: Le contexte extrait de la base de connaissances
-        max_retries: Nombre maximum de tentatives en cas d'erreur
-
+        question: User's question
+        context: Retrieved context from vector store
+        
     Returns:
-        str: La réponse générée
+        Generated answer or error message
     """
-    # Validation des entrées
-    if not question or not question.strip():
-        return "Erreur : Question vide."
+    if not context.strip():
+        return f"I couldn't find relevant information for: '{question}'."
+    
+    prompt = f"""You are an IT support expert assistant based on "The IT Support Handbook" by Mike Halsey.
 
-    # Construction du prompt
-    prompt = f"""Tu es un assistant professionnel de support IT spécialisé dans le troubleshooting et la formation des utilisateurs.
+Context from the book (with page numbers):
+{context}
 
-Contexte documentaire :
-{context if context and context.strip() else "Aucun contexte spécifique n'a été trouvé dans la base de connaissances."}
+Question: {question}
 
-Question de l'utilisateur :
-{question}
+Instructions:
+1. Answer ONLY based on the provided context
+2. Cite page numbers when available
+3. Be concise and practical (max {MAX_ANSWER_LENGTH} characters)
+4. If context is insufficient, state this clearly
+5. Focus on actionable information
 
-Instructions :
-1. Si le contexte contient des informations pertinentes, base ta réponse principalement dessus
-2. Si le contexte est vide ou insuffisant, réponds en te basant sur les bonnes pratiques générales du support IT
-3. Réponds de façon **brève et concise** (maximum {MAX_ANSWER_LENGTH} caractères)
-4. Structure ta réponse de manière claire avec :
-   - Une explication concise du concept ou problème
-   - Des étapes pratiques si applicable
-   - Des conseils ou précautions importantes
-5. Utilise un ton professionnel mais accessible
-6. N'invente jamais d'informations techniques non vérifiables
-7. Si tu n'es pas certain, indique-le clairement
+Answer in English:"""
 
-Réponds en français :"""
-
-    # ---------------------------
-    # Retry en cas d'erreur
-    # ---------------------------
-    for attempt in range(max_retries):
-        try:
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    temperature=0.7,
-                    top_p=0.95,
-                    max_output_tokens=1024,
-                    safety_settings=[
-                        types.SafetySetting(
-                            category="HARM_CATEGORY_DANGEROUS_CONTENT",
-                            threshold="BLOCK_NONE"
-                        )
-                    ]
-                )
+    try:
+        logger.info("Calling Gemini API...")
+        
+        model = genai.GenerativeModel(settings.LLM_MODEL)
+        
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.2,
+                top_p=0.8,
+                max_output_tokens=1024
             )
-
-            # Extraction du texte et tronquage
-            if response and response.text:
-                answer = response.text.strip()
-                if len(answer) > MAX_ANSWER_LENGTH:
-                    # Tronquer sur la dernière phrase complète
-                    answer = answer[:MAX_ANSWER_LENGTH].rsplit('.', 1)[0] + '.'
-                logger.info(f"Réponse générée avec succès (tentative {attempt + 1})")
-                return answer
-            else:
-                logger.warning(f"Réponse vide de Gemini (tentative {attempt + 1})")
-                if attempt == max_retries - 1:
-                    return "Désolé, je n'ai pas pu générer une réponse. Veuillez réessayer."
-
-        except Exception as e:
-            logger.error(f"Erreur génération Gemini (tentative {attempt + 1}/{max_retries}): {e}")
-            if attempt == max_retries - 1:
-                return f"Erreur lors de la génération de la réponse après {max_retries} tentatives. Veuillez contacter le support technique."
-
-    return "Une erreur inattendue s'est produite."
+        )
+        
+        logger.info("Received Gemini response")
+        
+        if response and response.text:
+            return response.text.strip()
+        
+        return "Sorry, I couldn't generate an answer."
+    
+    except Exception as e:
+        logger.error(f"Gemini error: {e}")
+        return f"LLM connection error.\n\nFound information:\n{context[:500]}..."

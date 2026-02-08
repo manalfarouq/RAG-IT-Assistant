@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 # Imports relatifs depuis le package courant
-from .routes import getAllUsers_router, login_router, register_router, query_router
+from .routes import getAllUsers_router, login_router, register_router, query_router, admin_router
 from .db.database import Base, engine
 # Import models to ensure they are registered with Base
 from . import models
@@ -17,3 +17,4 @@ app.include_router(register_router.router)
 app.include_router(login_router.router)
 app.include_router(getAllUsers_router.router)
 app.include_router(query_router.router)
+app.include_router(admin_router.router)
