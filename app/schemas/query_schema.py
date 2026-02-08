@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, field_serializer
 
 class QueryRequest(BaseModel):
     """Requête utilisateur"""
-    question: str = Field(..., example="Quels sont les fondamentaux du support IT ?")
+    question: str = Field(..., example="What Windows tool records user actions with annotated screenshots?")
 
 
 class QueryResponse(BaseModel):
