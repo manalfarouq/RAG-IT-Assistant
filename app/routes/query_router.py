@@ -1,4 +1,4 @@
-"""Route pour les requêtes RAG"""
+"""RAG query endpoints"""
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
@@ -12,7 +12,7 @@ from ..rag.pipeline import RAGPipeline
 
 router = APIRouter(prefix="/query", tags=["RAG Query"])
 
-# Instance unique du pipeline
+# Singleton pipeline instance
 rag_pipeline = RAGPipeline()
 
 
@@ -22,22 +22,35 @@ def query_rag(
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user)
 ):
-    """Effectue une requête RAG"""
+    """
+    Execute a RAG query.
+    
+    Retrieves relevant documents and generates an answer
+    using the LLM with retrieved context.
+    
+    Args:
+        request: Question to answer
+        db: Database session
+        current_user_id: Authenticated user ID
+        
+    Returns:
+        Query response with answer and metadata
+    """
     if not request.question.strip():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="La question ne peut pas être vide"
+            detail="Question cannot be empty"
         )
     
     start_time = time.time()
     
-    # Exécution RAG
+    # Execute RAG pipeline
     answer, cluster_id = rag_pipeline.query(request.question)
     
-    # Calcul latence
+    # Calculate latency
     latency_ms = (time.time() - start_time) * 1000
     
-    # Sauvegarde
+    # Save to database
     new_query = Query(
         user_id=current_user_id,
         question=request.question.strip(),
@@ -52,12 +65,3 @@ def query_rag(
     db.refresh(new_query)
     
     return new_query
-
-
-@router.get("/health")
-def health_check():
-    """Vérifie que le service est opérationnel"""
-    return {
-        "status": "healthy",
-        "service": "RAG Query"
-    }

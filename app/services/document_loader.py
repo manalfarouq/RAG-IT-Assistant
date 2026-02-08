@@ -1,34 +1,47 @@
-"""Chargement et découpage d'un PDF"""
+"""PDF document loading and processing"""
 from pathlib import Path
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from typing import List
-from ..core.config import settings
 import logging
+
+from ..core.config import settings
 
 logger = logging.getLogger(__name__)
 
-def load_and_split_pdf(pdf_path=None) -> List[Document]:
-    """Charge et découpe un PDF en chunks"""
+
+def load_and_split_pdf(pdf_path: str = None) -> List[Document]:
+    """
+    Load PDF and split into chunks.
     
+    Args:
+        pdf_path: Path to PDF file (uses settings.PDF_PATH if None)
+        
+    Returns:
+        List of Document chunks with metadata
+        
+    Raises:
+        FileNotFoundError: If PDF doesn't exist
+    """
     path = Path(pdf_path or settings.PDF_PATH)
 
     if not path.exists():
         raise FileNotFoundError(f"PDF not found: {path}")
 
-    logger.info(f"📄 Loading PDF: {path}")
+    logger.info(f"Loading PDF: {path}")
     
+    # Load PDF pages
     documents = PyPDFLoader(str(path)).load()
-    logger.info(f"📖 {len(documents)} pages loaded")
+    logger.info(f"Loaded {len(documents)} pages")
     
-    # Enrichir métadonnées
+    # Enrich metadata
     for i, doc in enumerate(documents):
         page_num = i + 1
         doc.metadata['page_number'] = page_num
         doc.metadata['source'] = 'PDF'
         
-        # Détecter chapitre
+        # Detect chapter information
         content_lower = doc.page_content.lower()
         if 'chapter' in content_lower:
             lines = doc.page_content.split('\n')
@@ -37,18 +50,18 @@ def load_and_split_pdf(pdf_path=None) -> List[Document]:
                     doc.metadata['chapter'] = line.strip()
                     break
 
-    # CHUNKS PLUS PETITS pour meilleure précision
+    # Split into chunks
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=300,      # ← Réduit de 500 à 300
-        chunk_overlap=50,    # ← Réduit de 100 à 50
+        chunk_size=settings.CHUNK_SIZE,
+        chunk_overlap=settings.CHUNK_OVERLAP,
         length_function=len,
         separators=["\n\n", "\n", ". ", "! ", "? ", " ", ""]
     )
 
     chunks = splitter.split_documents(documents)
-    logger.info(f"✂️ {len(chunks)} chunks created")
+    logger.info(f"Created {len(chunks)} chunks")
     
     if chunks:
-        logger.info(f"📝 Sample chunk:\n{chunks[0].page_content[:150]}...")
+        logger.info(f"Sample chunk: {chunks[0].page_content[:150]}...")
     
     return chunks
