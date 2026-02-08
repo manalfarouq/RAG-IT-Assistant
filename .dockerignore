@@ -1,41 +1,87 @@
+# ============================================
+# Docker Ignore - Optimize Build Context
+# ============================================
+
+# --------------------------------------------
+# Version Control
+# --------------------------------------------
+.git
+.gitignore
+.gitattributes
+
+# --------------------------------------------
+# Documentation
+# --------------------------------------------
+README.md
+CHANGELOG.md
+LICENSE
+docs/
+*.md
+
+# --------------------------------------------
 # Python
+# --------------------------------------------
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
+*.pyc
+*.pyo
+*.pyd
 .Python
+*.so
 venv/
 env/
-*.egg-info/
+.venv/
 .pytest_cache/
+.coverage
+htmlcov/
 
-# Docker
-.dockerignore
-Dockerfile
-docker-compose.yml
+# --------------------------------------------
+# Environment Files
+# --------------------------------------------
+.env
+.env.local
+.env.example
+*.key
+*.pem
 
-# Git
-.git/
-.gitignore
-
-# IDE
+# --------------------------------------------
+# IDEs & Editors
+# --------------------------------------------
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Logs
-logs/
-*.log
+# --------------------------------------------
+# Docker
+# --------------------------------------------
+Dockerfile*
+docker-compose*.yml
+.dockerignore
 
-# Data (sera monté en volume)
+# --------------------------------------------
+# Data (already mounted as volumes)
+# --------------------------------------------
 data/vector_db/
+data/models/
 
-# Environment
-.env.example
+# --------------------------------------------
+# Logs & Temporary
+# --------------------------------------------
+*.log
+tmp/
+temp/
+.cache/
 
-# History
-.history/
+# --------------------------------------------
+# OS
+# --------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# Tests
-tests/
+# --------------------------------------------
+# CI/CD
+# --------------------------------------------
+.github/
+.gitlab-ci.yml
+.travis.yml
